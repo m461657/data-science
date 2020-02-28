@@ -1,0 +1,153 @@
+---
+title: "Temperature Change Across the U.S.: To Hot to Handle?"
+author: "Megan Willis & Kyle Goulart"
+date: "02/21/2020"
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Load any R Packages you may need
+library(tidyverse)
+library(mosaic)
+library(ggthemes)
+library(readr)
+library(knitr)
+
+knitr::opts_knit$set(root.dir= normalizePath('..'))
+knitr::opts_chunk$set(error = FALSE)
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+USA_cc_1901_2016 <- read.csv("~/Desktop/MATH 228/Project1/USA_cc_1901-2016.csv")
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+climate_change = USA_cc_1901_2016 %>% 
+  rename(temp_c = "Temperature....Celsius.", month_avg = "Statistics") %>% 
+  select(-ISO3) %>% 
+  mutate(temp_f = (temp_c*9)/5 + 32)
+```
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+jan_temps = climate_change %>% 
+  filter(month_avg == " Jan Average") 
+```
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+temp_1901_2016 = climate_change %>% 
+  filter(Year %in% c(1901, 2016))
+
+temp_1901 = temp_1901_2016 %>% 
+  filter(Year == 1901)
+
+temp_2016 = temp_1901_2016 %>% 
+  filter(Year == 2016)
+```
+
+
+```{r,echo = FALSE, warning = FALSE, message = FALSE}
+julavg = climate_change %>% 
+  filter(month_avg == " Jul Average")
+```
+
+
+
+
+
+
+
+# How has the temperature in the US changed over the course of 115 years?
+## Introduction
+With climate change being an extremely important topic of conversation amongst people, in politics as well as in research, we wanted to explore whether or not temperature really has increased over the past century. From 1901 to 2016, the temperature in the United States has increased by approximately **5°F**. The dataset used recorded the average temperature for each month, starting in 1901 up until and through 2016. 
+
+## About the Data
+The dataset used includes the monthly average temperatures for each year, from 1901 through 2016. The original dataset only included the temperatures in degrees Celcius, so we added another variable with the equivalent temperatures in degrees Fahrenheight so the results are more meaningful. We changed the names of some columns so that they better represented the data, as well as removed unnecessary colums so the data was easier to read and interpret. [Click here for dataset.](https://climateknowledgeportal.worldbank.org/download-data)
+
+## The Data Graphics
+### Graphic 1
+Below are three different graphics we created to explore the change in temperature in the United States over 115 years. The first graphic, *Average Annual Temperature (°F)* shows the median temperature across all 12 months in 1901, and the median temperature across all 12 months in 2016 in the form of a boxplot. It also includes the spread of temperatures in each year, with both the high and low temperatures reported on the plot. A box plot was chosen for this graphic because it easily highlights the median temperature, as well as the maximum and minimum temperatures for each year (1901 and 2016) respecitvely. The side-by-side comparison gives us a quick overview or how much the average annual temperatures have increase over the past century, which is approximately **5°F**. 
+
+```{r}
+ggplot(data = temp_1901_2016, aes(y = temp_f, group = Year))+
+  geom_boxplot()+
+  labs(title = "Average Annual Temperature (°F)", subtitle = "1901 vs. 2016", y = "Temperature(°F)", caption = "Source: data.world")+
+  theme_economist_white()+
+  theme(axis.text.x= element_blank(), axis.ticks.x = element_blank())+
+  geom_text(x= -.31, y= 62, label = "1901", family = "Courier", color = "firebrick1", size = 5, fontface="bold")+
+  geom_text(x=0.07, y=65, label = "2016", family = "Courier", color = "firebrick1", size = 5, fontface = "bold")+
+  geom_text(x = -.2, y = 42.8, label = "Median: 44.26", family = "Courier", size = 3.5)+
+  geom_text(x = .2, y = 50, label = "Median: 48.70", family = "Courier", size = 3.5)+
+  geom_text(x = .28, y = 68, label = "70.15", size = 3.5, family = "Courier")+
+  geom_text(x = -.1, y =68, label = "69.51", size = 3.5, family = "Courier")+
+  geom_curve(x = -.13, xend = -.18, y = 68, yend = 69, 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.5, curvature = 0)+
+  geom_curve(x = .25, xend = .195, y = 68, yend = 69, 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.5, curvature = 0)+
+  geom_text(x = -.29, y = 25, label = "20.20", family = "Courier", size = 3.5)+
+  geom_text(x = .1, y = 31.4, label = "24.71", family = "Courier", size = 3.5)+
+  geom_curve(x = -.26, xend = -.195, y = 25, yend = 20.8, 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.5, curvature = 0)+
+  geom_curve(x = .13 , xend =.18 , y = 31 , yend = 25 , 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.5, curvature = 0)
+```
+
+
+### Graphic 2
+The second data graphic, *Average January Temperatures (°F)*, shows the trend of the average high and low temperatures, as well as their years. A line graph was chosen for this graphic because it illustrates the increase and decrease of average temperature from year to year, as well as the overall positive trend that is exhibited over this specific time period. We also decided to add a smooth line over the line graph to emphasize the trend of the data. By comparing the tempurature in 1901 to the temperature in 2016, you can see that there is an increase of approximately **5°F**, like the boxplot above.
+
+```{r, warning = FALSE, message = FALSE}
+ggplot(data = jan_temps, aes(x = Year, y = temp_f))+
+  geom_line()+
+  geom_smooth(se = FALSE, color = "firebrick1", size = 1.5)+
+  theme_economist_white()+
+  labs(title = "Average January Tempuratures (°F)", subtitle = "From 1901-2016", y = "Tempurature (°F)", caption = "Source: data.world")+
+  scale_x_continuous(breaks = seq(1900,2020, by = 10),labels = c("1900", "'10", "'20", "'30", "'40", "'50", "'60", "'70", "'80", "'90", "2000", "'10", "2020"))+
+  scale_y_continuous(breaks = seq(16,28, by = 2), labels = c("16","18","20","22","24","26","28"))+
+  geom_text(x = 1963, y = 27.4, label = "1981: 27.9 °F", size = 3.2, family = "Courier", color = "firebrick1")+
+  geom_text(x = 1936, y = 17, label = "1918: 16.6 °F", size = 3.2, family = "Courier", color = "firebrick1")+
+  geom_curve(x = 1973.5, xend = 1980, y = 27.4, yend = 27.9, 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.5, 
+             color = "firebrick1", curvature = 0)+
+    geom_curve(x = 1925.5, xend = 1919, y = 17, yend = 16.6, 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.5, 
+             color = "firebrick1", curvature = 0)
+  
+```
+
+### Graphic 3
+The third data graphic, *Average July Temperatures (°F)*, presents the average temperatures in July from 1901-2016. This plot features a smooth line superimposed across a scatterplot. The scatterplot was chosen because it nicely displays the spread of the data for the month of July, whereas the smooth line shows the overall average trend. Both the maximun and minimum temperatures and their respective years are labeled on the graph. The smooth line shows that the average temperature for July has only increased by roughly **2.5°F** (67-69.5°F). Opposed to the average temperatures in January (5°F increase), the this graphc shows that the average temperature in the summer months (specifically July) are increasing at the same rate as the average temperatures in the winter months (specifically January).
+
+```{r, warning = FALSE, message = FALSE}
+ggplot(data = julavg, aes(x = Year, y = temp_f)) +
+  geom_point() +
+  geom_smooth(se = FALSE, color = "firebrick1", size = 1.5) +
+  theme_economist_white() +
+  labs(y = "Temperature (°F)", title = "Average July Temperatures (°F)", subtitle = "From 1901-2016", caption = "Source: data.world") +
+  scale_x_continuous(breaks = seq(1900, 2020, by = 10),
+                     labels  = c("1900", "'10", "'20", "'30", "'40", "'50", "'60", "'70", "'80", "'90", "2000", "'10", "'20")) +
+  
+  geom_text(x = 1992, y = 70.3, family = "Courier",
+            label = "2012:\n70.5°F", color = "firebrick1") +
+  geom_curve(x = 1996.5, xend = 2011.5, y = 70.3, yend = 70.47, 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.8, 
+             color = "firebrick1", curvature = -0.15) +
+  
+  geom_text(x = 1935, y = 66.8, family = "Courier",
+            label = "1924:\n65.75°F", color = "firebrick1") +
+  geom_curve(x = 1934, xend = 1924.6, y = 66.4, yend = 65.75, 
+             arrow = arrow(length = unit(0.08, "inch")), size = 0.8, 
+             color = "firebrick1", curvature = -0.3)
+```
+
+## Conclusion
+After examining the above three data graphics, it is clear that the average annual temperature over the 100+ years has increased by nearly 5°F. We would like to accentuate that although the two months that we have selected for this post, January and July, don't share the same average temperature increase, we expect that some of the other months that haven't been analyzed show and average increase greater than five degrees. This is due to the fact that the increase of the average annual temperature from 1901 to 2016 is approximately **5°F**. That being said, it is safe to say that our climate is **changing!**
+
+
+
+
+
+
